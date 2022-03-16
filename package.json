@@ -1,13 +1,18 @@
 {
-  "name": "templater",
+  "name": "@danieletulone/templater",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "dist/index.js",
   "repository": "git@github.com:danieletulone/templater.git",
   "author": "danieletulone <danieletulone.work@gmail.com>",
   "license": "MIT",
   "private": false,
+  "scripts": {
+    "build": "shx rm -rf dist && tsc -b"
+  },
   "devDependencies": {
     "@types/node": "^16.9.4",
-    "ts-node": "^10.7.0"
-  }
+    "ts-node": "^10.7.0",
+    "typescript": "^4.6.2"
+  },
+  "types": "dist/index.d.ts"
 }
