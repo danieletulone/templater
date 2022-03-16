@@ -1,0 +1,13 @@
+{
+  "name": "templater",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:danieletulone/templater.git",
+  "author": "danieletulone <danieletulone.work@gmail.com>",
+  "license": "MIT",
+  "private": false,
+  "devDependencies": {
+    "@types/node": "^16.9.4",
+    "ts-node": "^10.7.0"
+  }
+}
