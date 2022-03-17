@@ -3,46 +3,19 @@ import { Replacers } from '../common/types/replacers.type'
 
 export default abstract class Template<R extends { [key: string]: unknown }> {
   /**
-   * Name of file to generate.
-   */
-  get name (): string {
-    const nameSegments = this.constructor.name
-      .replace('Template', '')
-      .split(/(?=[A-Z])/);
-
-    let extension = ''
-
-    if (nameSegments.length > 1) {
-      extension = nameSegments.pop()?.toLowerCase() as string;
-    }
-
-    return nameSegments
-      .map((s) => s.toLowerCase())
-      .map((s) => this.nameFilter(s))
-      .join('-')
-      .concat(
-        extension ? '.' + extension : ''
-      );
-  };
-
-  /**
    * Replacers bag.
    */
-  private _replacers: Partial<Replacers<R>> = {};
+  protected _replacers: Partial<Replacers<R>> = {};
 
   /**
    * Symbol to use for wrap replacers.
    */
-  private _keyWrapper = '__'
+  protected _keyWrapper = '__'
 
   /**
    * Template compiled.
    */
   protected compiled = ''
-
-  nameFilter (s: string): string {
-    return s
-  }
 
   /**
    * Get a replacer.
@@ -122,13 +95,5 @@ export default abstract class Template<R extends { [key: string]: unknown }> {
 
   toString() {
     return this.compiled;
-  }
-}
-
-class A extends Template<{ a: string, b: number; }> {
-  content(): string {
-    return `
-      ${this.getReplacer('b', (data) => data.toFixed())}
-    `
   }
 }
