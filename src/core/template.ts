@@ -1,9 +1,7 @@
-import { Replacer } from './common/interfaces/replacer.interface';
-import { ReplacerValue } from './common/types/replacer-value.type';
-import { Replacers } from './common/types/replacers.type';
-import { format } from './utils';
+import { format } from '../utils';
+import { Replacers } from '../common/types/replacers.type'
 
-export default abstract class Template<R extends Replacers> {
+export default abstract class Template<R extends { [key: string]: unknown }> {
   /**
    * Name of file to generate.
    */
@@ -30,7 +28,7 @@ export default abstract class Template<R extends Replacers> {
   /**
    * Replacers bag.
    */
-  private _replacers: Record<string, Replacer<R[keyof R]>> = {};
+  private _replacers: Partial<Replacers<R>> = {};
 
   /**
    * Symbol to use for wrap replacers.
@@ -59,14 +57,15 @@ export default abstract class Template<R extends Replacers> {
    * @param transform
    * @returns
    */
-  getReplacer(keyName: keyof R & string, transform?: ReplacerValue<R[keyof R]>): string {
-    const keyComposed = this._keyWrapper + keyName + this._keyWrapper;
+  getReplacer<P extends keyof R>(key: P, transform?: Replacers<R>[P]['transform']) {
+    const keyComposed = this._keyWrapper + key + this._keyWrapper;
+    const replacerObj = this._replacers[key]
 
-    if (!this._replacers[keyName]) {
-      throw new Error("You must provide replacer for " + keyName);
+    if (replacerObj === undefined) {
+      throw new Error("You must provide replacer for " + key);
     }
 
-    this._replacers[keyName].transform = transform;
+    replacerObj.transform = transform;
 
     return keyComposed;
   }
@@ -83,26 +82,16 @@ export default abstract class Template<R extends Replacers> {
    * @param value Value of replacer.
    * @returns
    */
-  provideReplacer(key: keyof R & string, value: R[keyof R]): this {
+  provideReplacer<P extends keyof R>(key: P, value: R[P]): this {
+    const replacerObj = this._replacers[key]
+
+    if (replacerObj !== undefined) {
+      throw new Error("Value for " + key + " is already provided.");
+    }
+
     this._replacers[key] = {
       value: value
     }
-
-    const transform = this._replacers[key].transform;
-
-    if (transform && typeof value !== 'string') {
-      throw new Error("Cannot provide replacer. First, generate a key.");
-    }
-
-    let valueAsString = ''
-
-    if (transform) {
-      valueAsString = transform(value);
-    } else {
-      valueAsString = value
-    }
-
-    this._replacers[key].value = valueAsString
 
     return this;
   }
@@ -129,5 +118,17 @@ export default abstract class Template<R extends Replacers> {
     this.compiled = content
 
     return this
+  }
+
+  toString() {
+    return this.compiled;
+  }
+}
+
+class A extends Template<{ a: string, b: number; }> {
+  content(): string {
+    return `
+      ${this.getReplacer('b', (data) => data.toFixed())}
+    `
   }
 }

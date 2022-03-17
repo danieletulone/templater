@@ -1,2 +1,2 @@
-export { default as Template } from './template';
-export { default as TemplateFile } from './template-file';
+export { default as Template } from './core/template';
+export { default as TemplateFile } from './core/template-file';
